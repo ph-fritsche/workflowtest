@@ -43,7 +43,7 @@ jobs:
             branchIsDev,
           }
     outputs:
-      info: steps.script.outputs
+      info: ${{ steps.script.outputs.result }}
 
 
   consumer:
@@ -53,6 +53,9 @@ jobs:
     - uses: actions/github-script@v3
       with:
         script: |
-          console.log(process.env.test)
+          console.log('!')
+          console.log(JSON.stringify(process.env.test))
+          console.log('!')
+
       env:
         test: ${{needs.helper.outputs.info}}
