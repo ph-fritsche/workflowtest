@@ -19,9 +19,9 @@ jobs:
         script: |
           const fs = require('fs')
 
-          const packageType = {
-            node: fs.existsSync('package.json'),
-            composer: fs.existsSync('composer.json'),
+          const package = {
+            node: fs.existsSync('package.json') && JSON.parse(fs.readFileSync('package.json')),
+            composer: fs.existsSync('composer.json') && JSON.parse(fs.readFileSync('composer.json')),
           }
 
           let branchRef = ''
@@ -37,7 +37,7 @@ jobs:
           const branchIsDev = ['next', 'pre', 'alpha', 'beta', 'dev'].includes(branchName)
 
           return {
-            packageType,
+            package,
             branchName,
             branchIsMain,
             branchIsMaintenance,
@@ -55,7 +55,7 @@ jobs:
       with:
         script: |
           console.log('!')
-          console.log(JSON.stringify(process.env.test))
+          console.log(process.env.test)
           console.log('!')
 
       env:
