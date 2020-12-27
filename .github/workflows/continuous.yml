@@ -87,6 +87,8 @@ jobs:
           console.log('!')
           console.log(process.env.test)
           console.log('!')
+          console.log(process.env.expr)
 
       env:
         test: ${{needs.helper.outputs.info}}
+        expr: ${{!!needs.helper.outputs.info}}
