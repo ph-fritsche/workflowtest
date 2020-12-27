@@ -9,6 +9,8 @@ on:
   release:
 
 jobs:
+
+  # The helper provides information about the event that can be used later on
   helper:
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +48,34 @@ jobs:
     outputs:
       info: ${{ steps.script.outputs.result }}
 
+  quality-node:
+    name: "Code quality for node packages"
+    needs: helper
+    if: needs.helper.outputs.info.package.node
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: yarn install --frozen-lockfile
+    - if: needs.helper.outputs.info.package.node.scripts.lint
+      run: yarn run lint
+    - if: needs.helper.outputs.info.package.node.scripts.test
+      run: yarn run test
+
+  quality-composer:
+    name: "Code quality for composer packages"
+    needs: helper
+    if: needs.helper.outputs.info.package.composer
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: composer install
+    - if: needs.helper.outputs.info.package.composer.scripts.lint
+      run: composer lint
+    - if: needs.helper.outputs.info.package.composer.scripts.test
+      run: composer test
 
   consumer:
     needs: helper
