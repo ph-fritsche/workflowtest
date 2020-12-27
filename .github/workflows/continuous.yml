@@ -46,12 +46,18 @@ jobs:
             branchIsDev,
           }
     outputs:
-      info: ${{ fromJson(steps.script.outputs.result) }}
+      info: ${{ steps.script.outputs.result }}
+      runCQNode: ${{ !!fromJson(steps.script.outputs.result).package.node }}
+      runCQNodeLint: ${{ !!fromJson(steps.script.outputs.result).package.node.scripts.lint }}
+      runCQNodeTest: ${{ !!fromJson(steps.script.outputs.result).package.node.scripts.test }}
+      runCQComposer: ${{ !!fromJson(steps.script.outputs.result).package.composer }}
+      runCQComposerLint: ${{ !!fromJson(steps.script.outputs.result).package.composer.scripts.lint }}
+      runCQComposerTest: ${{ !!fromJson(steps.script.outputs.result).package.composer.scripts.test }}
 
   quality-node:
     name: "Code quality for node packages"
     needs: helper
-    if: ${{ !!needs.helper.outputs.info.package.node }}
+    if: needs.helper.outputs.runCQNode == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -59,22 +65,22 @@ jobs:
       with:
         node-version: 12
     - run: yarn install --frozen-lockfile
-    - if: needs.helper.outputs.info.package.node.scripts.lint
+    - if: needs.helper.outputs.runCQNodeLint == 'true'
       run: yarn run lint
-    - if: needs.helper.outputs.info.package.node.scripts.test
+    - if: needs.helper.outputs.runCQNodeTest == 'true'
       run: yarn run test
 
   quality-composer:
     name: "Code quality for composer packages"
     needs: helper
-    if: ${{ !!needs.helper.outputs.info.package.composer }}
+    if: needs.helper.outputs.runCQComposer == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: composer install
-    - if: needs.helper.outputs.info.package.composer.scripts.lint
+    - if: needs.helper.outputs.runCQComposerLint == 'true'
       run: composer lint
-    - if: needs.helper.outputs.info.package.composer.scripts.test
+    - if: needs.helper.outputs.runCQComposerTest == 'true'
       run: composer test
 
   consumer:
@@ -95,5 +101,5 @@ jobs:
       env:
         test: ${{needs.helper.outputs.info}}
         expr: ${{!!needs.helper.outputs.info}}
-        expr2: ${{!!needs.helper.outputs.info['package']}}
-        expr3: ${{!!needs.helper.outputs.info.package.node}}
+        expr2: ${{!!fromJson(needs.helper.outputs.info).package}}
+        expr3: ${{!!fromJson(steps.script.outputs.result).package.node.scripts.test}}
