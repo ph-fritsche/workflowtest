@@ -51,7 +51,7 @@ jobs:
   quality-node:
     name: "Code quality for node packages"
     needs: helper
-    if: needs.helper.outputs.info.package.node != false
+    if: ${{ !!needs.helper.outputs.info.package.node }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
   quality-composer:
     name: "Code quality for composer packages"
     needs: helper
-    if: needs.helper.outputs.info.package.composer != false
+    if: ${{ !!needs.helper.outputs.info.package.composer }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -86,9 +86,14 @@ jobs:
         script: |
           console.log('!')
           console.log(process.env.test)
+          console.log(process.env.test.package)
           console.log('!')
           console.log(process.env.expr)
+          console.log(process.env.expr2)
+          console.log(process.env.expr3)
 
       env:
         test: ${{needs.helper.outputs.info}}
         expr: ${{!!needs.helper.outputs.info}}
+        expr2: ${{!!needs.helper.outputs.info['package']}}
+        expr3: ${{!!needs.helper.outputs.info.package.node}}
