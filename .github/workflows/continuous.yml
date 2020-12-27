@@ -51,7 +51,7 @@ jobs:
   quality-node:
     name: "Code quality for node packages"
     needs: helper
-    if: needs.helper.outputs.info.package.node
+    if: needs.helper.outputs.info.package.node != false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
   quality-composer:
     name: "Code quality for composer packages"
     needs: helper
-    if: needs.helper.outputs.info.package.composer
+    if: needs.helper.outputs.info.package.composer != false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
