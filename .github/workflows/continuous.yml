@@ -24,12 +24,13 @@ jobs:
           }
 
           let branchRef = ''
-          if (github.event_name === 'push') {
-            branchRef = github.ref
-          } else if (github.event_name === 'pull_request') {
+          if (process.env.GITHUB_EVENT_NAME === 'push') {
+            branchRef = process.env.GITHUB_REF
+          } else if (process.env.GITHUB_EVENT_NAME === 'pull_request') {
             branchRef = process.env.GITHUB_BASE_REF
           }
-          const branchName = branchRef.startsWith('/refs/heads/') && branchRef.substr(11)
+          console.log(branchRef)
+          const branchName = branchRef.startsWith('refs/heads/') && branchRef.substr(11)
 
           const branchIsMaintenance = /^\d+\.\d+$/.test(branchName)
           const branchIsMain = ['master', 'main'].includes(branchName)
