@@ -1,2 +1,6 @@
 {
+    "scripts": {
+        "lint": "echo foo",
+        "build": "echo bar"
+    }
 }
