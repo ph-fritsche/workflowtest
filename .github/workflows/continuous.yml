@@ -46,7 +46,7 @@ jobs:
             branchIsDev,
           }
     outputs:
-      info: ${{ steps.script.outputs.result }}
+      info: ${{ fromJson(steps.script.outputs.result) }}
 
   quality-node:
     name: "Code quality for node packages"
