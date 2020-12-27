@@ -12,6 +12,7 @@ jobs:
   helper:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - id: script
       uses: actions/github-script@v3
       with:
@@ -29,7 +30,6 @@ jobs:
           } else if (process.env.GITHUB_EVENT_NAME === 'pull_request') {
             branchRef = process.env.GITHUB_BASE_REF
           }
-          console.log(branchRef)
           const branchName = branchRef.startsWith('refs/heads/') && branchRef.substr(11)
 
           const branchIsMaintenance = /^\d+\.\d+$/.test(branchName)
