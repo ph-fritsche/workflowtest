@@ -1,7 +1,7 @@
 # Because jobs can not depend on other workflows at the moment,
 # this workflow combines the code quality checks with release actions.
 
-name: Continuous Integration
+name: CI
 
 on:
   push:
@@ -48,39 +48,45 @@ jobs:
     outputs:
       info: ${{ steps.script.outputs.result }}
       runCQNode: ${{ !!fromJson(steps.script.outputs.result).package.node }}
+      runCQNodeValidate: ${{ !!fromJson(steps.script.outputs.result).package.node.scripts.validate }}
       runCQNodeLint: ${{ !!fromJson(steps.script.outputs.result).package.node.scripts.lint }}
       runCQNodeTest: ${{ !!fromJson(steps.script.outputs.result).package.node.scripts.test }}
       runCQComposer: ${{ !!fromJson(steps.script.outputs.result).package.composer }}
+      runCQComposerValidate: ${{ !!fromJson(steps.script.outputs.result).package.composer.scripts.validate }}
       runCQComposerLint: ${{ !!fromJson(steps.script.outputs.result).package.composer.scripts.lint }}
       runCQComposerTest: ${{ !!fromJson(steps.script.outputs.result).package.composer.scripts.test }}
 
   quality-node:
-    name: "Code quality for node packages"
+    name: "Check for node"
     needs: helper
     if: needs.helper.outputs.runCQNode == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
-      with:
-        node-version: 12
     - run: yarn install --frozen-lockfile
-    - if: needs.helper.outputs.runCQNodeLint == 'true'
+    - id: validate
+      if: needs.helper.outputs.runCQNodeValidate == 'true'
       run: yarn run lint
-    - if: needs.helper.outputs.runCQNodeTest == 'true'
+    - if: steps.validate.conclusion == 'skipped' && needs.helper.outputs.runCQNodeLint == 'true'
+      run: yarn run lint
+    - if: steps.validate.conclusion == 'skipped' && needs.helper.outputs.runCQNodeTest == 'true'
       run: yarn run test
 
   quality-composer:
-    name: "Code quality for composer packages"
+    name: "Check for composer"
     needs: helper
     if: needs.helper.outputs.runCQComposer == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: composer install
-    - if: needs.helper.outputs.runCQComposerLint == 'true'
+    - id: validate
+      if: needs.helper.outputs.runCQComposerValidate == 'true'
       run: composer lint
-    - if: needs.helper.outputs.runCQComposerTest == 'true'
+    - if: steps.validate.conclusion == 'skipped' && needs.helper.outputs.runCQComposerLint == 'true'
+      run: composer lint
+    - if: steps.validate.conclusion == 'skipped' && needs.helper.outputs.runCQComposerTest == 'true'
       run: composer test
 
   consumer:
