@@ -5,6 +5,7 @@ on:
 
 jobs:
   release:
+    steps:
     - uses: actions/checkout@v2
     - uses: ph-fritsche/action-helper
     - id: please
