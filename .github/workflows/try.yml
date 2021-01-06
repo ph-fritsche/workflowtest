@@ -1,0 +1,13 @@
+name: automatic release
+
+on:
+  push:
+
+jobs:
+  try:
+    runs-on: ubuntu-latest
+    steps:
+    - name: try
+      run:
+        echo "run_id ${{ github.run_id }}"
+        echo "run_number ${{ github.run_number }}"
