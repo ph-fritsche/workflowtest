@@ -7,7 +7,17 @@ jobs:
   try:
     runs-on: ubuntu-latest
     steps:
-    - name: try
-      run:
-        echo "run_id ${{ github.run_id }}"
-        echo "run_number ${{ github.run_number }}"
+    - name: success
+      run: |
+        EXPECTED="${{ needs.build.outputs.buildCommit || github.sha }}"
+        if [ $(git rev-parse HEAD) != $EXPECTED ]; then
+          echo "::error ::HEAD moved to $(git rev-parse HEAD) - expected ${EXPECTED}"
+          exit 1
+        fi
+    - name: fails
+      run: |
+        EXPECTED="${{ needs.build.outputs.buildCommit || github.sha }}"
+        if [ $(git rev-parse HEAD) != "foo" ]; then
+          echo "::error ::HEAD moved to $(git rev-parse HEAD) - expected ${EXPECTED}"
+          exit 1
+        fi
